@@ -66,3 +66,40 @@ button:hover {
     background: #c9a000;
     transform: scale(1.05);
 }
+
+#message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    width: 100%;
+}
+
+.success {
+    background: rgba(0, 255, 0, 0.2);
+    color: green;
+    border: 1px solid green;
+}
+
+.error {
+    background: rgba(255, 0, 0, 0.2);
+    color: red;
+    border: 1px solid red;
+}
+
+#clock {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-family: 'MedievalSharp', cursive;
+    font-size: 20px;
+    color: gold;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid gold;
+    animation: glow 2s infinite alternate;
+}
