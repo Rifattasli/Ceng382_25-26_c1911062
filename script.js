@@ -1,44 +1,38 @@
 document.addEventListener("DOMContentLoaded", () => {
+    
     const loginButton = document.getElementById("login-btn");
-    const usernameInput = document.querySelector("input[type='text']");
-    const passwordInput = document.querySelector("input[type='password']");
-    const messageDiv = document.createElement("div");
-    messageDiv.id = "message";
-    document.querySelector(".login-container").appendChild(messageDiv);
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const messageDiv = document.getElementById("message");
 
     const loginAttempts = [];
-    const formElements = document.querySelectorAll(".input-group, button"); // Select all inputs & button
-    let isHidden = false; // Track form visibility state
+    const validCredentials = { username: "admin", password: "admin" };
 
-    loginButton.addEventListener("click", () => {
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
+    if (loginButton) {
+        loginButton.addEventListener("click", () => {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
 
-        if (username === "" || password === "") {
-            showMessage("⚠️ Please enter both username and password!", "error");
-            return;
-        }
-
-        loginAttempts.push({ username, password });
-        console.log("Login Attempts:", loginAttempts);
-        showMessage(`✅ Welcome, ${username}!`, "success");
-
-        loginButton.textContent = "Entering...";
-        loginButton.style.background = "#c9a000";
-
-        setTimeout(() => {
-            document.body.style.animation = "fadeOut 1.5s forwards";
-        }, 1000);
-    });
-
-    function showMessage(msg, type) {
-        messageDiv.textContent = msg;
-        messageDiv.className = type;
+            if (username === validCredentials.username && password === validCredentials.password) {
+                loginAttempts.push({ username, password });
+                console.log("Login Successful!", loginAttempts);
+                messageDiv.textContent = "✅ Login successful! Redirecting...";
+                messageDiv.className = "success";
+                
+                setTimeout(() => {
+                    window.location.href = "table.html"; // Redirect to class table page
+                }, 1500);
+            } else {
+                messageDiv.textContent = "❌ Incorrect Username or Password!";
+                messageDiv.className = "error";
+            }
+        });
     }
 
-    //  Live Clock Function
+    // clock
     function updateClock() {
         const clockElement = document.getElementById("clock");
+        if (!clockElement) return;
         const now = new Date();
         const hours = now.getHours().toString().padStart(2, "0");
         const minutes = now.getMinutes().toString().padStart(2, "0");
@@ -48,15 +42,87 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     setInterval(updateClock, 1000);
-    updateClock(); // Run once immediately
+    updateClock(); 
 
-    //  Toggle form visibility on 'H' key press
+    // H key
     document.addEventListener("keydown", (event) => {
         if (event.key.toLowerCase() === "h") {
-            isHidden = !isHidden;
-            formElements.forEach(el => {
-                el.style.display = isHidden ? "none" : "block";
+            document.querySelectorAll(".input-group, button").forEach(el => {
+                el.style.display = el.style.display === "none" ? "block" : "none";
             });
         }
+    });
+
+    // table
+    const classForm = document.getElementById("class-form");
+    const classTable = document.getElementById("class-table")?.querySelector("tbody");
+
+    if (classForm && classTable) {
+        classForm.addEventListener("submit", (event) => {
+            event.preventDefault(); // Prevent form reload
+
+            
+            const className = document.getElementById("class-name").value.trim();
+            const numPeople = document.getElementById("num-people").value.trim();
+            const description = document.getElementById("description").value.trim();
+
+            if (className === "" || numPeople === "" || description === "") {
+                alert("⚠️ Please fill out all fields!");
+                return;
+            }
+
+            
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td class="editable">${className}</td>
+                <td class="editable">${numPeople}</td>
+                <td class="editable">${description}</td>
+                <td><button class="delete-btn">❌ Remove</button></td>
+            `;
+
+            
+            classTable.appendChild(row);
+
+            
+            row.addEventListener("click", () => {
+                row.classList.toggle("highlight");
+            });
+
+            
+            row.querySelectorAll(".editable").forEach(cell => {
+                cell.addEventListener("dblclick", () => {
+                    const currentValue = cell.textContent;
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.value = currentValue;
+                    cell.innerHTML = "";
+                    cell.appendChild(input);
+                    input.focus();
+
+                    input.addEventListener("blur", () => {
+                        cell.textContent = input.value;
+                    });
+                });
+            });
+
+            
+            row.querySelector(".delete-btn").addEventListener("click", () => {
+                row.remove();
+            });
+
+        
+            classForm.reset();
+        });
+    }
+
+    
+    document.querySelectorAll("input, textarea").forEach(inputField => {
+        inputField.addEventListener("focus", () => {
+            inputField.style.boxShadow = "0 0 10px gold";
+        });
+
+        inputField.addEventListener("blur", () => {
+            inputField.style.boxShadow = "none";
+        });
     });
 });
