@@ -13,63 +13,87 @@ namespace LabProject.Pages
         [BindProperty]
         public ClassInformationModel NewClass { get; set; } = new();
 
-        [BindProperty(SupportsGet = true)]
-        public int? EditId { get; set; }
+        public List<ClassInformationTable> FilteredList { get; set; } = new();
 
+        
+        [BindProperty(SupportsGet = true)]
+        public string? FilterName { get; set; }
+
+        
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+
+        public int PageSize { get; set; } = 10;
+        public int TotalPages { get; set; }
+        private static bool TestDataLoaded = false;
         public void OnGet()
         {
-            if (EditId.HasValue)
+            if (!TestDataLoaded)
+    {
+        for (int i = 1; i <= 100; i++)
+        {
+            ClassList.Add(new ClassInformationModel
             {
-                var item = ClassList.FirstOrDefault(c => c.Id == EditId.Value);
-                if (item != null)
-                {
-                    NewClass = new ClassInformationModel
-                    {
-                        Id = item.Id,
-                        ClassName = item.ClassName,
-                        StudentCount = item.StudentCount,
-                        Description = item.Description
-                    };
-                }
+                Id = ClassInformationModel.GenerateId(),
+                ClassName = $"Class {i}",
+                StudentCount = 20 + (i % 10),
+                Description = $"Sample description {i}"
+            });
+        }
+        TestDataLoaded = true;
+    }
+
+
+            var query = ClassList.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(FilterName))
+            {
+                query = query.Where(c => c.ClassName.Contains(FilterName));
             }
+
+            TotalPages = (int)System.Math.Ceiling(query.Count() / (double)PageSize);
+
+            var pagedData = query
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .Select(c => new ClassInformationTable
+                {
+                    Id = c.Id,
+                    ClassName = c.ClassName,
+                    StudentCount = c.StudentCount,
+                    Description = c.Description
+                })
+                .ToList();
+
+            FilteredList = pagedData;
         }
 
         public IActionResult OnPostAdd()
-        {
-            if (!ModelState.IsValid)
-                return Page();
+{
+    if (!ModelState.IsValid)
+        return Page();
 
-            // Elle ID ver
-            NewClass.Id = ClassInformationModel.GenerateId();
+    NewClass.Id = ClassInformationModel.GenerateId();
+    ClassList.Add(NewClass);
 
-            ClassList.Add(NewClass);
-            return RedirectToPage();
-        }
+    return RedirectToPage(new
+    {
+        FilterName,
+        PageNumber
+    });
+}
 
-        public IActionResult OnPostUpdate()
-        {
-            if (!ModelState.IsValid)
-                return Page();
+       public IActionResult OnPostDelete(int id)
+{
+    var item = ClassList.FirstOrDefault(c => c.Id == id);
+    if (item != null)
+        ClassList.Remove(item);
 
-            var existing = ClassList.FirstOrDefault(c => c.Id == NewClass.Id);
-            if (existing != null)
-            {
-                existing.ClassName = NewClass.ClassName;
-                existing.StudentCount = NewClass.StudentCount;
-                existing.Description = NewClass.Description;
-            }
-
-            return RedirectToPage();
-        }
-
-        public IActionResult OnPostDelete(int id)
-        {
-            var item = ClassList.FirstOrDefault(c => c.Id == id);
-            if (item != null)
-            {
-                ClassList.Remove(item);
-            }
-            return RedirectToPage();
-        }
+    return RedirectToPage(new
+    {
+        FilterName,
+        PageNumber
+    });
+}
     }
 }
