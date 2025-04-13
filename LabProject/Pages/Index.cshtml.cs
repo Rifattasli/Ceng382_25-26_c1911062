@@ -3,46 +3,51 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using LabProject.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text;
+using LabProject.Helpers;
+
 
 namespace LabProject.Pages
 {
     public class IndexModel : PageModel
     {
-        public static List<ClassInformationModel> ClassList = new();
+        public static List<ClassInformationModel> ClassList { get; set; } = new();
+        public List<ClassInformationTable> FilteredList { get; set; } = new();
 
         [BindProperty]
         public ClassInformationModel NewClass { get; set; } = new();
 
-        public List<ClassInformationTable> FilteredList { get; set; } = new();
-
-        
         [BindProperty(SupportsGet = true)]
         public string? FilterName { get; set; }
 
-        
         [BindProperty(SupportsGet = true)]
         public int PageNumber { get; set; } = 1;
 
+        [BindProperty(SupportsGet = true)]
+        public List<string> SelectedColumns { get; set; } = new();
+
         public int PageSize { get; set; } = 10;
         public int TotalPages { get; set; }
+
         private static bool TestDataLoaded = false;
+
         public void OnGet()
         {
             if (!TestDataLoaded)
-    {
-        for (int i = 1; i <= 100; i++)
-        {
-            ClassList.Add(new ClassInformationModel
             {
-                Id = ClassInformationModel.GenerateId(),
-                ClassName = $"Class {i}",
-                StudentCount = 20 + (i % 10),
-                Description = $"Sample description {i}"
-            });
-        }
-        TestDataLoaded = true;
-    }
-
+                for (int i = 1; i <= 100; i++)
+                {
+                    ClassList.Add(new ClassInformationModel
+                    {
+                        Id = ClassInformationModel.GenerateId(),
+                        ClassName = $"Class {i}",
+                        StudentCount = 20 + (i % 10),
+                        Description = $"Sample description {i}"
+                    });
+                }
+                TestDataLoaded = true;
+            }
 
             var query = ClassList.AsQueryable();
 
@@ -66,34 +71,74 @@ namespace LabProject.Pages
                 .ToList();
 
             FilteredList = pagedData;
+
+            
+            if (SelectedColumns.Count == 0)
+            {
+                SelectedColumns = new List<string> { "ClassName", "StudentCount", "Description" };
+            }
         }
 
         public IActionResult OnPostAdd()
+        {
+            if (!ModelState.IsValid)
+                return Page();
+
+            NewClass.Id = ClassInformationModel.GenerateId();
+            ClassList.Add(NewClass);
+
+            return RedirectToPage(new
+            {
+                FilterName,
+                PageNumber
+            });
+        }
+
+        public IActionResult OnPostDelete(int id)
+        {
+            var item = ClassList.FirstOrDefault(c => c.Id == id);
+            if (item != null)
+                ClassList.Remove(item);
+
+            return RedirectToPage(new
+            {
+                FilterName,
+                PageNumber
+            });
+        }
+
+
+public IActionResult OnPostExport(List<string> columns, bool isFiltered, string? filterName)
 {
-    if (!ModelState.IsValid)
-        return Page();
+    var source = isFiltered
+        ? ClassList
+            .Where(c => string.IsNullOrWhiteSpace(filterName) || c.ClassName.Contains(filterName))
+            .Select(c => new ClassInformationTable
+            {
+                Id = c.Id,
+                ClassName = c.ClassName,
+                StudentCount = c.StudentCount,
+                Description = c.Description
+            }).ToList()
+        : ClassList.Select(c => new ClassInformationTable
+        {
+            Id = c.Id,
+            ClassName = c.ClassName,
+            StudentCount = c.StudentCount,
+            Description = c.Description
+        }).ToList();
 
-    NewClass.Id = ClassInformationModel.GenerateId();
-    ClassList.Add(NewClass);
-
-    return RedirectToPage(new
+    var exportData = source.Select(item =>
     {
-        FilterName,
-        PageNumber
+        var obj = new Dictionary<string, object>();
+        if (columns.Contains("ClassName")) obj["ClassName"] = item.ClassName;
+        if (columns.Contains("StudentCount")) obj["StudentCount"] = item.StudentCount;
+        if (columns.Contains("Description")) obj["Description"] = item.Description;
+        return obj;
     });
-}
 
-       public IActionResult OnPostDelete(int id)
-{
-    var item = ClassList.FirstOrDefault(c => c.Id == id);
-    if (item != null)
-        ClassList.Remove(item);
-
-    return RedirectToPage(new
-    {
-        FilterName,
-        PageNumber
-    });
+    var jsonBytes = Utils.Instance.ExportToJson(exportData);
+    return File(jsonBytes, "application/json", "export.json");
 }
     }
 }
