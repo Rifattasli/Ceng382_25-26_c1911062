@@ -599,6 +599,304 @@
       ]
     },
     {
+      "Route": "data/users.3mdt9fd7cz.json",
+      "AssetFile": "data/users.json.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.006172839506"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "161"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RFTrjn5jsl2uVYjFAYtcwfKH5tfPsz08rAksCoLi4+M=\""
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"K7+aZeBPlJ18mj5KmrqQOd1qk0pU9Q3EBbPIY3EMUkg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 18 Apr 2025 11:18:43 GMT"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "3mdt9fd7cz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-K7+aZeBPlJ18mj5KmrqQOd1qk0pU9Q3EBbPIY3EMUkg="
+        },
+        {
+          "Name": "label",
+          "Value": "data/users.json"
+        }
+      ]
+    },
+    {
+      "Route": "data/users.3mdt9fd7cz.json",
+      "AssetFile": "data/users.json",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "315"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"K7+aZeBPlJ18mj5KmrqQOd1qk0pU9Q3EBbPIY3EMUkg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 18 Apr 2025 11:18:43 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "3mdt9fd7cz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-K7+aZeBPlJ18mj5KmrqQOd1qk0pU9Q3EBbPIY3EMUkg="
+        },
+        {
+          "Name": "label",
+          "Value": "data/users.json"
+        }
+      ]
+    },
+    {
+      "Route": "data/users.3mdt9fd7cz.json.gz",
+      "AssetFile": "data/users.json.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "161"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RFTrjn5jsl2uVYjFAYtcwfKH5tfPsz08rAksCoLi4+M=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 18 Apr 2025 11:18:43 GMT"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "3mdt9fd7cz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-RFTrjn5jsl2uVYjFAYtcwfKH5tfPsz08rAksCoLi4+M="
+        },
+        {
+          "Name": "label",
+          "Value": "data/users.json.gz"
+        }
+      ]
+    },
+    {
+      "Route": "data/users.json",
+      "AssetFile": "data/users.json.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.006172839506"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "161"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RFTrjn5jsl2uVYjFAYtcwfKH5tfPsz08rAksCoLi4+M=\""
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"K7+aZeBPlJ18mj5KmrqQOd1qk0pU9Q3EBbPIY3EMUkg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 18 Apr 2025 11:18:43 GMT"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-K7+aZeBPlJ18mj5KmrqQOd1qk0pU9Q3EBbPIY3EMUkg="
+        }
+      ]
+    },
+    {
+      "Route": "data/users.json",
+      "AssetFile": "data/users.json",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "315"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"K7+aZeBPlJ18mj5KmrqQOd1qk0pU9Q3EBbPIY3EMUkg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 18 Apr 2025 11:18:43 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-K7+aZeBPlJ18mj5KmrqQOd1qk0pU9Q3EBbPIY3EMUkg="
+        }
+      ]
+    },
+    {
+      "Route": "data/users.json.gz",
+      "AssetFile": "data/users.json.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "161"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RFTrjn5jsl2uVYjFAYtcwfKH5tfPsz08rAksCoLi4+M=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 18 Apr 2025 11:18:43 GMT"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-RFTrjn5jsl2uVYjFAYtcwfKH5tfPsz08rAksCoLi4+M="
+        }
+      ]
+    },
+    {
       "Route": "favicon.61n19gt1b8.ico",
       "AssetFile": "favicon.ico.gz",
       "Selectors": [

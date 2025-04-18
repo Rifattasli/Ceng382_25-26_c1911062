@@ -96,3 +96,4 @@
 /Users/rifattasli/Documents/LOTR Login /Ceng382_25-26_c1911062/LabProject/obj/Debug/net9.0/LabProject.pdb
 /Users/rifattasli/Documents/LOTR Login /Ceng382_25-26_c1911062/LabProject/obj/Debug/net9.0/LabProject.genruntimeconfig.cache
 /Users/rifattasli/Documents/LOTR Login /Ceng382_25-26_c1911062/LabProject/obj/Debug/net9.0/ref/LabProject.dll
+/Users/rifattasli/Documents/LOTR Login /Ceng382_25-26_c1911062/LabProject/obj/Debug/net9.0/compressed/avu68zfqrh-3mdt9fd7cz.gz

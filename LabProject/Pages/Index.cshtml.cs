@@ -34,6 +34,26 @@ namespace LabProject.Pages
 
         public void OnGet()
         {
+
+
+    string? cookieUsername = Request.Cookies["Username"];
+    string? cookieToken = Request.Cookies["Token"];
+    string? cookieSessionId = Request.Cookies["SessionId"];
+
+    string? sessionUsername = HttpContext.Session.GetString("Username");
+    string? sessionToken = HttpContext.Session.GetString("Token");
+    string? sessionId = HttpContext.Session.GetString("SessionId");
+
+    if (cookieUsername != sessionUsername ||
+        cookieToken != sessionToken ||
+        cookieSessionId != sessionId)
+    {
+        TempData["ErrorMessage"] = "Login required or session expired.";
+        Response.Redirect("/Login");
+        return;
+    }
+
+
             if (!TestDataLoaded)
             {
                 for (int i = 1; i <= 100; i++)
@@ -106,6 +126,17 @@ namespace LabProject.Pages
                 PageNumber
             });
         }
+
+        public IActionResult OnPostLogout()
+{
+    HttpContext.Session.Clear();
+
+    Response.Cookies.Delete("Username");
+    Response.Cookies.Delete("Token");
+    Response.Cookies.Delete("SessionId");
+
+    return RedirectToPage("/Login");
+}
 
 
 public IActionResult OnPostExport(List<string> columns, bool isFiltered, string? filterName)

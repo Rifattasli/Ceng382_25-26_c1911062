@@ -17,7 +17,6 @@ namespace LabProject.Models
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }=string.Empty;
 
-        // ID üretimi için
         public static int GenerateId()
         {
             return _nextId++;

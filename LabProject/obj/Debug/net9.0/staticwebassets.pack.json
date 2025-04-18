@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets/css/site.css"
     },
     {
+      "Id": "/Users/rifattasli/Documents/LOTR Login /Ceng382_25-26_c1911062/LabProject/wwwroot/data/users.json",
+      "PackagePath": "staticwebassets/data/users.json"
+    },
+    {
       "Id": "/Users/rifattasli/Documents/LOTR Login /Ceng382_25-26_c1911062/LabProject/wwwroot/favicon.ico",
       "PackagePath": "staticwebassets/favicon.ico"
     },
