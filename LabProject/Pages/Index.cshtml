@@ -6,7 +6,9 @@
 
 <div class="container mt-5">
     <div class="row">
-    
+       
+
+        <!-- LEFT: Form -->
         <div class="col-md-6">
             <h4>@(Model.NewClass?.Id > 0 ? "Edit Class" : "Add Class")</h4>
 
@@ -37,11 +39,11 @@
             </form>
         </div>
 
-        
+        <!-- RIGHT: Table -->
         <div class="col-md-6">
             <h4>Class List</h4>
 
-            
+            <!-- Filter -->
             <form method="get" class="mb-3">
                 <div class="input-group">
                     <input type="text" name="FilterName" value="@Model.FilterName" class="form-control" placeholder="Filter by class name" />
@@ -49,34 +51,38 @@
                 </div>
             </form>
 
-<form method="post" asp-page-handler="Export" class="mb-3">
+            <!-- Export -->
+            <form method="post" asp-page-handler="Export" class="mb-3">
+                <input type="hidden" name="IsFiltered" value="true" />
+                <input type="hidden" name="FilterName" value="@Model.FilterName" />
+                <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+                <input type="hidden" name="SelectedColumns" value="@string.Join(",", Model.SelectedColumns)" />
+                <button type="submit" class="btn btn-success">Export Current Page to JSON</button>
+            </form>
 
-    <input type="hidden" name="IsFiltered" value="true" />
-    <input type="hidden" name="FilterName" value="@Model.FilterName" />
-    <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" name="columns" value="ClassName" checked>
-        <label class="form-check-label">Class Name</label>
-    </div>
-    <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" name="columns" value="StudentCount" checked>
-        <label class="form-check-label">Student Count</label>
-    </div>
-    <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" name="columns" value="Description" checked>
-        <label class="form-check-label">Description</label>
-    </div>
-
-    <div class="mt-2">
-        <input type="hidden" name="IsFiltered" value="true" /> 
-        <button type="submit" class="btn btn-success">Export to JSON</button>
-    </div>
-</form>
+            <!-- Table -->
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Class Name</th>
-                        <th>Student Count</th>
-                        <th>Description</th>
+                        @foreach (var column in new[] { "ClassName", "StudentCount", "Description" })
+                        {
+                            bool isSelected = Model.SelectedColumns.Contains(column);
+                            string thClass = isSelected ? "table-primary" : "";
+
+                            var updatedColumns = new List<string>(Model.SelectedColumns);
+                            if (isSelected) updatedColumns.Remove(column);
+                            else updatedColumns.Add(column);
+
+                            string href = $"/Index?FilterName={Model.FilterName}&PageNumber={Model.PageNumber}";
+                            foreach (var col in updatedColumns)
+                            {
+                                href += $"&SelectedColumns={col}";
+                            }
+
+                            <th class="@thClass">
+                                <a href="@href" class="text-dark text-decoration-none d-block">@column</a>
+                            </th>
+                        }
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -84,9 +90,9 @@
                     @foreach (var item in Model.FilteredList)
                     {
                         <tr>
-                            <td>@item.ClassName</td>
-                            <td>@item.StudentCount</td>
-                            <td>@item.Description</td>
+                            <td class="@(Model.SelectedColumns.Contains("ClassName") ? "table-primary" : "")">@item.ClassName</td>
+                            <td class="@(Model.SelectedColumns.Contains("StudentCount") ? "table-primary" : "")">@item.StudentCount</td>
+                            <td class="@(Model.SelectedColumns.Contains("Description") ? "table-primary" : "")">@item.Description</td>
                             <td>
                                 <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" class="d-inline">
                                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
@@ -97,20 +103,22 @@
                 </tbody>
             </table>
 
-            
+            <!-- Pagination -->
             <nav>
                 <ul class="pagination">
                     @for (int i = 1; i <= Model.TotalPages; i++)
                     {
                         <li class="page-item @(i == Model.PageNumber ? "active" : "")">
                             <a class="page-link"
-                               asp-page="./Index"
-                               asp-route-FilterName="@Model.FilterName"
-                               asp-route-PageNumber="@i">@i</a>
+                               href="@($"/Index?FilterName={Model.FilterName}&PageNumber={i}&{string.Join("&", Model.SelectedColumns.Select(c => $"SelectedColumns={c}"))}")">
+                                @i
+                            </a>
                         </li>
                     }
                 </ul>
             </nav>
+
+            
         </div>
     </div>
 </div>

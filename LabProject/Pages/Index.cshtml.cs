@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text;
-using LabProject.Helpers;
-
 
 namespace LabProject.Pages
 {
@@ -34,6 +32,7 @@ namespace LabProject.Pages
 
         public void OnGet()
         {
+
             if (!TestDataLoaded)
             {
                 for (int i = 1; i <= 100; i++)
@@ -58,7 +57,7 @@ namespace LabProject.Pages
 
             TotalPages = (int)System.Math.Ceiling(query.Count() / (double)PageSize);
 
-            var pagedData = query
+            FilteredList = query
                 .Skip((PageNumber - 1) * PageSize)
                 .Take(PageSize)
                 .Select(c => new ClassInformationTable
@@ -70,9 +69,6 @@ namespace LabProject.Pages
                 })
                 .ToList();
 
-            FilteredList = pagedData;
-
-            
             if (SelectedColumns.Count == 0)
             {
                 SelectedColumns = new List<string> { "ClassName", "StudentCount", "Description" };
@@ -90,7 +86,8 @@ namespace LabProject.Pages
             return RedirectToPage(new
             {
                 FilterName,
-                PageNumber
+                PageNumber,
+                SelectedColumns = string.Join(",", SelectedColumns)
             });
         }
 
@@ -103,42 +100,53 @@ namespace LabProject.Pages
             return RedirectToPage(new
             {
                 FilterName,
-                PageNumber
+                PageNumber,
+                SelectedColumns = string.Join(",", SelectedColumns)
             });
         }
 
-
-public IActionResult OnPostExport(List<string> columns, bool isFiltered, string? filterName)
-{
-    var source = isFiltered
-        ? ClassList
-            .Where(c => string.IsNullOrWhiteSpace(filterName) || c.ClassName.Contains(filterName))
-            .Select(c => new ClassInformationTable
-            {
-                Id = c.Id,
-                ClassName = c.ClassName,
-                StudentCount = c.StudentCount,
-                Description = c.Description
-            }).ToList()
-        : ClassList.Select(c => new ClassInformationTable
+        public IActionResult OnPostLogout()
         {
-            Id = c.Id,
-            ClassName = c.ClassName,
-            StudentCount = c.StudentCount,
-            Description = c.Description
-        }).ToList();
+            HttpContext.Session.Clear();
+            Response.Cookies.Delete("Username");
+            Response.Cookies.Delete("Token");
+            Response.Cookies.Delete("SessionId");
+            return RedirectToPage("/Login");
+        }
 
-    var exportData = source.Select(item =>
-    {
-        var obj = new Dictionary<string, object>();
-        if (columns.Contains("ClassName")) obj["ClassName"] = item.ClassName;
-        if (columns.Contains("StudentCount")) obj["StudentCount"] = item.StudentCount;
-        if (columns.Contains("Description")) obj["Description"] = item.Description;
-        return obj;
-    });
+        public IActionResult OnPostExport(string SelectedColumns, bool isFiltered, string? filterName, int PageNumber)
+        {
+            var columns = SelectedColumns.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-    var jsonBytes = Utils.Instance.ExportToJson(exportData);
-    return File(jsonBytes, "application/json", "export.json");
-}
+            var query = isFiltered
+                ? ClassList.Where(c => string.IsNullOrWhiteSpace(filterName) || c.ClassName.Contains(filterName))
+                : ClassList.AsEnumerable();
+
+            const int PageSize = 10;
+            var pagedData = query
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .Select(c => new ClassInformationTable
+                {
+                    Id = c.Id,
+                    ClassName = c.ClassName,
+                    StudentCount = c.StudentCount,
+                    Description = c.Description
+                })
+                .ToList();
+
+            var exportData = pagedData.Select(item =>
+            {
+                var obj = new Dictionary<string, object>();
+                if (columns.Contains("ClassName")) obj["ClassName"] = item.ClassName;
+                if (columns.Contains("StudentCount")) obj["StudentCount"] = item.StudentCount;
+                if (columns.Contains("Description")) obj["Description"] = item.Description;
+                return obj;
+            });
+
+            var json = JsonSerializer.Serialize(exportData, new JsonSerializerOptions { WriteIndented = true });
+            var bytes = Encoding.UTF8.GetBytes(json);
+            return File(bytes, "application/json", $"page{PageNumber}_export.json");
+        }
     }
 }
