@@ -53,6 +53,8 @@ namespace LabProject.Pages
         Response.Cookies.Append("Token", token, cookieOptions);
         Response.Cookies.Append("SessionId", HttpContext.Session.Id, cookieOptions);
 
+        
+
         return RedirectToPage("/Index");
     }
 

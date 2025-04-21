@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text;
-using LabProject.Helpers;
-
 
 namespace LabProject.Pages
 {
@@ -22,6 +20,8 @@ namespace LabProject.Pages
         public string? FilterName { get; set; }
 
         [BindProperty(SupportsGet = true)]
+
+        
         public int PageNumber { get; set; } = 1;
 
         [BindProperty(SupportsGet = true)]
@@ -34,25 +34,26 @@ namespace LabProject.Pages
 
         public void OnGet()
         {
+            string? cookieUsername = Request.Cookies["Username"];
+            string? cookieToken = Request.Cookies["Token"];
+            string? cookieSessionId = Request.Cookies["SessionId"];
 
+            string? sessionUsername = HttpContext.Session.GetString("Username");
+            string? sessionToken = HttpContext.Session.GetString("Token");
+            string? sessionId = HttpContext.Session.GetString("SessionId");
+            
 
-    string? cookieUsername = Request.Cookies["Username"];
-    string? cookieToken = Request.Cookies["Token"];
-    string? cookieSessionId = Request.Cookies["SessionId"];
+            ViewData["SessionToken"] = sessionToken;
+            ViewData["CookieToken"] = cookieToken;
 
-    string? sessionUsername = HttpContext.Session.GetString("Username");
-    string? sessionToken = HttpContext.Session.GetString("Token");
-    string? sessionId = HttpContext.Session.GetString("SessionId");
-
-    if (cookieUsername != sessionUsername ||
-        cookieToken != sessionToken ||
-        cookieSessionId != sessionId)
-    {
-        TempData["ErrorMessage"] = "Login required or session expired.";
-        Response.Redirect("/Login");
-        return;
-    }
-
+            if (cookieUsername != sessionUsername ||
+                cookieToken != sessionToken ||
+                cookieSessionId != sessionId)
+            {
+                TempData["ErrorMessage"] = "Login required or session expired.";
+                Response.Redirect("/Login");
+                return;
+            }
 
             if (!TestDataLoaded)
             {
@@ -78,7 +79,7 @@ namespace LabProject.Pages
 
             TotalPages = (int)System.Math.Ceiling(query.Count() / (double)PageSize);
 
-            var pagedData = query
+            FilteredList = query
                 .Skip((PageNumber - 1) * PageSize)
                 .Take(PageSize)
                 .Select(c => new ClassInformationTable
@@ -90,9 +91,6 @@ namespace LabProject.Pages
                 })
                 .ToList();
 
-            FilteredList = pagedData;
-
-            
             if (SelectedColumns.Count == 0)
             {
                 SelectedColumns = new List<string> { "ClassName", "StudentCount", "Description" };
@@ -110,7 +108,8 @@ namespace LabProject.Pages
             return RedirectToPage(new
             {
                 FilterName,
-                PageNumber
+                PageNumber,
+                SelectedColumns = string.Join(",", SelectedColumns)
             });
         }
 
@@ -123,43 +122,44 @@ namespace LabProject.Pages
             return RedirectToPage(new
             {
                 FilterName,
-                PageNumber
+                PageNumber,
+                SelectedColumns = string.Join(",", SelectedColumns)
             });
         }
 
         public IActionResult OnPostLogout()
+        {
+            HttpContext.Session.Clear();
+            Response.Cookies.Delete("Username");
+            Response.Cookies.Delete("Token");
+            Response.Cookies.Delete("SessionId");
+
+            return RedirectToPage("/Login");
+        }
+
+        public IActionResult OnPostExport(string SelectedColumns, bool isFiltered, string? filterName, int PageNumber)
 {
-    HttpContext.Session.Clear();
+    var columns = SelectedColumns.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-    Response.Cookies.Delete("Username");
-    Response.Cookies.Delete("Token");
-    Response.Cookies.Delete("SessionId");
-
-    return RedirectToPage("/Login");
-}
-
-
-public IActionResult OnPostExport(List<string> columns, bool isFiltered, string? filterName)
-{
-    var source = isFiltered
+    var query = isFiltered
         ? ClassList
             .Where(c => string.IsNullOrWhiteSpace(filterName) || c.ClassName.Contains(filterName))
-            .Select(c => new ClassInformationTable
-            {
-                Id = c.Id,
-                ClassName = c.ClassName,
-                StudentCount = c.StudentCount,
-                Description = c.Description
-            }).ToList()
-        : ClassList.Select(c => new ClassInformationTable
+        : ClassList.AsEnumerable();
+
+    const int PageSize = 10;
+    var pagedData = query
+        .Skip((PageNumber - 1) * PageSize)
+        .Take(PageSize)
+        .Select(c => new ClassInformationTable
         {
             Id = c.Id,
             ClassName = c.ClassName,
             StudentCount = c.StudentCount,
             Description = c.Description
-        }).ToList();
+        })
+        .ToList();
 
-    var exportData = source.Select(item =>
+    var exportData = pagedData.Select(item =>
     {
         var obj = new Dictionary<string, object>();
         if (columns.Contains("ClassName")) obj["ClassName"] = item.ClassName;
@@ -168,8 +168,9 @@ public IActionResult OnPostExport(List<string> columns, bool isFiltered, string?
         return obj;
     });
 
-    var jsonBytes = Utils.Instance.ExportToJson(exportData);
-    return File(jsonBytes, "application/json", "export.json");
+    var json = JsonSerializer.Serialize(exportData, new JsonSerializerOptions { WriteIndented = true });
+    var bytes = Encoding.UTF8.GetBytes(json);
+    return File(bytes, "application/json", $"page{PageNumber}_export.json");
 }
     }
 }
