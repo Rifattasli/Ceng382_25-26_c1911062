@@ -1,65 +1,56 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Http;
+using LabProject.Data;
 using LabProject.Models;
-using System.Text.Json;
+using System.Linq;
 
 namespace LabProject.Pages
 {
     public class LoginModel : PageModel
     {
-        [BindProperty]
-        public string Username { get; set; } = "";
+        private readonly SchoolDbContext _context;
 
-        [BindProperty]
-        public string Password { get; set; } = "";
-
-        public bool LoginFailed { get; set; }
-
-      public async Task<IActionResult> OnPostAsync()
-{
-    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/data/users.json");
-
-    if (!System.IO.File.Exists(filePath))
-    {
-        LoginFailed = true;
-        return Page();
-    }
-
-    string json = await System.IO.File.ReadAllTextAsync(filePath);
-    var users = JsonSerializer.Deserialize<List<User>>(json);
-
-    var user = users?.FirstOrDefault(u =>
-        u.Username == Username &&
-        u.Password == Password &&
-        u.IsActive);
-
-    if (user != null)
-    {
-        string token = Guid.NewGuid().ToString();
-
-        HttpContext.Session.SetString("Username", user.Username);
-        HttpContext.Session.SetString("Token", token);
-        HttpContext.Session.SetString("SessionId", HttpContext.Session.Id);
-
-        var cookieOptions = new CookieOptions
+        public LoginModel(SchoolDbContext context)
         {
-            Expires = DateTimeOffset.Now.AddMinutes(30),
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict
-        };
+            _context = context;
+        }
 
-        Response.Cookies.Append("Username", user.Username, cookieOptions);
-        Response.Cookies.Append("Token", token, cookieOptions);
-        Response.Cookies.Append("SessionId", HttpContext.Session.Id, cookieOptions);
+        // ✅ FORM verisini bağlamak için
+        [BindProperty]
+        public InputModel Input { get; set; }
 
-        
+        // ✅ Hatalı giriş kontrolü için
+        public bool ShowLoginError { get; set; }
 
-        return RedirectToPage("/Index");
-    }
+        // ✅ İç sınıf: formda username ve password tutulur
+        public class InputModel
+        {
+            public string Username { get; set; }
+            public string Password { get; set; }
+        }
 
-    LoginFailed = true;
-    return Page();
-}
+        public IActionResult OnPost()
+        {
+            var user = _context.Users.FirstOrDefault(u =>
+                u.Username == Input.Username &&
+                u.Password == Input.Password &&
+                u.IsActive);
+
+            if (user != null)
+            {
+                HttpContext.Session.SetString("Username", user.Username);
+                HttpContext.Session.SetString("SessionId", HttpContext.Session.Id);
+
+                Response.Cookies.Append("Username", user.Username);
+                Response.Cookies.Append("Token", "token-value");
+                Response.Cookies.Append("SessionId", HttpContext.Session.Id);
+
+                return RedirectToPage("/Index");
+            }
+
+            ShowLoginError = true;
+            return Page();
+        }
     }
 }

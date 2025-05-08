@@ -11,26 +11,19 @@
 
             <form method="post">
                 <div class="mb-3">
-                    <label asp-for="Username" class="form-label">Username</label>
-                    <input asp-for="Username" class="form-control" />
+                    <label asp-for="Input.Username" class="form-label">Username</label>
+                    <input asp-for="Input.Username" class="form-control" />
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Password" class="form-label">Password</label>
-                    <input asp-for="Password" type="password" class="form-control" />
+                    <label asp-for="Input.Password" class="form-label">Password</label>
+                    <input asp-for="Input.Password" type="password" class="form-control" />
                 </div>
 
-                @if (Model.LoginFailed)
+                @if (Model.ShowLoginError)
                 {
                     <div class="alert alert-danger" role="alert">
                         Invalid username or password.
-                    </div>
-                }
-
-                @if (TempData["ErrorMessage"] != null)
-                {
-                    <div class="alert alert-warning">
-                        @TempData["ErrorMessage"]
                     </div>
                 }
 
